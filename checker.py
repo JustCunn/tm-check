@@ -13,7 +13,12 @@ def build_api_url(event_id: str, quantity: int) -> str:
 
 async def check_ticket_availability(playwright, event_id: str, quantity: int) -> bool:
     browser = await playwright.chromium.launch(headless=True)
-    context = await browser.new_context()
+    context = await browser.new_context(user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/115.0.0.0 Safari/537.36"
+            ),
+            locale='en-US',)
 
     # Visit event page to establish session
     event_url = f"https://www.ticketmaster.ie/event/{event_id}"
