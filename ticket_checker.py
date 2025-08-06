@@ -14,6 +14,9 @@ async def main():
         "--interval", type=int, default=60, help="Polling interval in seconds (default: 60)"
     )
     parser.add_argument(
+        "--proxy", type=str, help="Proxy URL to use for requests (optional, e.g., 'http://user:pass@proxyserver:port')"
+    )
+    parser.add_argument(
     "--consec-fails", type=int, default=10, help="The number of consecutive unsuccessful searches until alert"
     )
     
@@ -26,7 +29,7 @@ async def main():
         unsuccessful_count = 0
         try:
             while True:
-                is_available = await safe_check_ticket_availability(playwright, args.event_id, args.quantity)
+                is_available = await safe_check_ticket_availability(playwright, args.event_id, args.quantity, args.proxy)
 
                 if is_available:
                     unsuccessful_count = 0
