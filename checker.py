@@ -11,8 +11,8 @@ def build_api_url(event_id: str, quantity: int) -> str:
         f"?sort=price&offset=0&qty={quantity}&primary=true&resale=true&tids=000000000001"
     )
 
-async def check_ticket_availability(playwright, event_id: str, quantity: int) -> bool:
-    browser = await playwright.chromium.launch(headless=True)
+async def check_ticket_availability(playwright, event_id: str, quantity: int, proxy_url: str = None) -> bool:
+    browser = await playwright.chromium.launch(headless=True, proxy={"server": proxy_url} if proxy_url else None)
     context = await browser.new_context(user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -42,10 +42,10 @@ async def check_ticket_availability(playwright, event_id: str, quantity: int) ->
     await browser.close()
     return quantity_available > 0 or len(picks) > 0
 
-def safe_check_ticket_availability(playwright, event_id: str, quantity: int, retries=3) -> bool:
+def safe_check_ticket_availability(playwright, event_id: str, quantity: int, proxy_url: str = None, retries=3) -> bool:
     for attempt in range(retries):
         try:
-            return check_ticket_availability(playwright, event_id, quantity)
+            return check_ticket_availability(playwright, event_id, quantity, proxy_url)
         except Exception as e:
             wait_time = 2 ** attempt + random.uniform(0.5, 1.5)
             print(f"[WARN] Attempt {attempt+1} failed: {e}. Retrying in {wait_time:.1f}s...")
